@@ -6,12 +6,16 @@ import os
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+STATIC_FOLDER = 'static'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(STATIC_FOLDER, exist_ok=True)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def detect_anomaly(file_path):
     data = pd.read_csv(file_path)
 
+    # For demo / normal data
     is_clean_data = 'normal' in file_path.lower() or 'sensor_data.csv' in file_path.lower()
 
     if is_clean_data:
@@ -69,7 +73,7 @@ def detect_anomaly(file_path):
     axs[2].grid(True)
 
     plt.tight_layout()
-    graph_path = os.path.join('static', 'anomaly_plot.png')
+    graph_path = os.path.join(STATIC_FOLDER, 'anomaly_plot.png')
     plt.savefig(graph_path)
     plt.close()
 
@@ -102,10 +106,6 @@ def download_file():
     return send_file('sensor_data_with_anomaly.csv', as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(debug=True)
-import os
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8501))  # default for Streamlit is 8501
-    os.system(f"streamlit run app.py --server.port {port} --server.address 0.0.0.0")
-
+    import os
+    port = int(os.environ.get("PORT", 5000))  # default port for Heroku/Render
+    app.run(host='0.0.0.0', port=port)
